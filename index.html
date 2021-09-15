@@ -218,10 +218,10 @@
 			function playAudio() {
 				var audio = new Audio('audio/first.mp3');
 				audio.play();
-				audio.volume = 0.005;
+				audio.volume = 0.01;
 
 				setTimeout(function(){
-					audio.volume = 0.01;
+					audio.volume = 0.05;
 					setTimeout(function(){
 						audio.volume = 0.1;
 					}, 5000);
