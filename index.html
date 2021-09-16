@@ -4,7 +4,7 @@
 		<meta charset="utf-8">
 		<meta http-equiv="Content-Type" content="text/html; charset=utf-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>    
-		<title>DeepAR</title>
+		<title>Emmy Awards</title>
 		<style>
 
 			.button-layer {
@@ -34,7 +34,6 @@
 				left: 0;
 				bottom: 0;
 				width: 100%;
-				background-color: red;
 				color: white;
 				text-align: center;
 			}
@@ -67,12 +66,13 @@
 				margin: 4px 2px;
 				border-radius: 50%;
 				cursor: pointer;
-				height: 80px;
-				width: 80px;
-				color: black;
+				height: 60px;
+				width: 60px;
+				color: white;
 				background-color: red;
 				border: 4px solid #fff;
 				box-shadow: 0 0 0 5px red;
+				margin-bottom: 5%;
 			}
 
 			.loader {
@@ -175,7 +175,7 @@
 		</div>
 
 		<div class="footer first-screen" onclick="playDeepAR()">
-			<h3 style="font-family: sans-serif;">Play</h3>
+			<button id="start-btn" class="btn-capture" style="font-family: sans-serif;">Start</button>
 		</div>
 
 		<div class="cr-screen" style="display: none;font-family: sans-serif;">
@@ -213,7 +213,12 @@
 
 			let deepAR;
 
+			// Logic for record video
+			let deeparCanvas = document.getElementById('deepar-canvas');
+
 			$("#loader-wrapper").hide();
+
+			confirm("Press a button!");
 
 			function playAudio() {
 				var audio = new Audio('audio/first.mp3');
@@ -229,72 +234,98 @@
 			}
 
 			function playDeepAR() {
-				$(".first-screen").hide();
-				$("#loader-wrapper").show();
-				$("#deepar-canvas").show();
 
-				deepAR = DeepAR({ 
-					canvasWidth: canvasWidth, 
-					canvasHeight: canvasHeight,
-					licenseKey: 'your_license_key_goes_here',
-					canvas: deeparCanvas,
-					numberOfFaces: 1,
-					libPath: './lib',
-					segmentationInfoZip: 'segmentation.zip',
-					onInitialize: function() {
-						// start video immediately after the initalization, mirror = true
-						deepAR.startVideo(true);
+				let count = 3;
 
-						// or we can setup the video element externally and call deepAR.setVideoElement (see startExternalVideo function below)
-
-						deepAR.switchEffect(0, 'slot', './effects/background_segmentation', function() {
-						// effect loaded
-						});
-					}
+				$("#start-btn").css({
+					'font-size': 'xx-large',
+					'font-weight': 'bolder'
 				});
+				$("#start-btn").text(count);
 
-				deepAR.onCameraPermissionAsked = function() {
-					console.log('camera permission asked');
-				};
+				countable = setInterval(function (){
 
-				deepAR.onCameraPermissionGranted = function() {
-					console.log('camera permission granted');
-				};
+					count -= 1;
 
-				deepAR.onCameraPermissionDenied = function() {
-					console.log('camera permission denied');
-				};
+					if (count > 0) {
 
-				deepAR.onScreenshotTaken = function(photo) {
-					let aTag = document.createElement("a");
-					aTag.href = photo;
-					aTag.download = "";
-					aTag.click();
-				};
+						$("#start-btn").text(count);
 
-				deepAR.onImageVisibilityChanged = function(visible) {
-					console.log('image visible', visible);
-				};
+					} else if (count <= 0) {
 
-				deepAR.onFaceVisibilityChanged = function(visible) {
-					console.log('face visible', visible);
-				};
+						clearInterval(countable);
 
-				deepAR.onVideoStarted = function() {
-					setTimeout(function(){
-						playAudio();
-					}, 3000);
-					var loaderWrapper = document.getElementById('loader-wrapper');
-					loaderWrapper.style.display = 'none';
-					$(".cr-screen").show();
-				};
+						$(".first-screen").hide();
 
-				deepAR.onFaceTracked = function(faceData) {
-					// console.log(faceData);
-				};
+						// $("#loader-wrapper").show();
+						$("#deepar-canvas").show();
+						$(".cr-screen").show();
 
-				deepAR.downloadFaceTrackingModel('lib/models-68-extreme.bin');
+						playClapping();
+
+					}
+
+				}, 1000);
+
 			}
+
+			deepAR = DeepAR({ 
+				canvasWidth: canvasWidth, 
+				canvasHeight: canvasHeight,
+				licenseKey: 'your_license_key_goes_here',
+				canvas: deeparCanvas,
+				numberOfFaces: 1,
+				libPath: './lib',
+				segmentationInfoZip: 'segmentation.zip',
+				onInitialize: function() {
+					// start video immediately after the initalization, mirror = true
+					deepAR.startVideo(true);
+
+					// or we can setup the video element externally and call deepAR.setVideoElement (see startExternalVideo function below)
+
+					deepAR.switchEffect(0, 'slot', './effects/background_segmentation', function() {
+					// effect loaded
+					});
+				}
+			});
+
+			deepAR.onCameraPermissionAsked = function() {
+				console.log('camera permission asked');
+			};
+
+			deepAR.onCameraPermissionGranted = function() {
+				console.log('camera permission granted');
+			};
+
+			deepAR.onCameraPermissionDenied = function() {
+				console.log('camera permission denied');
+			};
+
+			deepAR.onScreenshotTaken = function(photo) {
+				let aTag = document.createElement("a");
+				aTag.href = photo;
+				aTag.download = "";
+				aTag.click();
+			};
+
+			deepAR.onImageVisibilityChanged = function(visible) {
+				console.log('image visible', visible);
+			};
+
+			deepAR.onFaceVisibilityChanged = function(visible) {
+				console.log('face visible', visible);
+			};
+
+			deepAR.onVideoStarted = function() {
+				var loaderWrapper = document.getElementById('loader-wrapper');
+				loaderWrapper.style.display = 'none';
+			};
+
+			deepAR.onFaceTracked = function(faceData) {
+				console.log(faceData);
+			};
+
+			deepAR.downloadFaceTrackingModel('lib/models-68-extreme.bin');
 
 			// Store video objects for cleanup
 			var videoObjects = {};
@@ -317,7 +348,13 @@
 					timeout_id = setTimeout(function() {
 						hold_event = true;
 						mediaRecorder.start();
-						$("body").css("opacity", 0.5);
+						$('#capture').css("border-radius", "unset");
+						setTimeout(function() {
+							clearTimeout(timeout_id);
+							hold_event = false;
+							mediaRecorder.stop();
+							$('#capture').css("border-radius", "50%");
+						}, 20000);
 					}, hold_time);
 
 					touchstartevent = true;
@@ -327,7 +364,13 @@
 						timeout_id = setTimeout(function() {
 							hold_event = true;
 							mediaRecorder.start();
-							$("body").css("opacity", 0.5);
+							$('#capture').css("border-radius", "unset");
+							setTimeout(function() {
+								clearTimeout(timeout_id);
+								hold_event = false;
+								mediaRecorder.stop();
+								$('#capture').css("border-radius", "50%");
+							}, 20000);
 						}, hold_time);
 					} else {
 						touchstartevent == false;
@@ -340,7 +383,7 @@
 					if (hold_event) {
 						hold_event = false;
 						mediaRecorder.stop();
-						$("body").css("opacity", 1);
+						$('#capture').css("border-radius", "50%");
 					} else {
 						deepAR.takeScreenshot();
 						$("body").fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100);
@@ -351,7 +394,7 @@
 						if (hold_event) {
 							hold_event = false;
 							mediaRecorder.stop();
-							$("body").css("opacity", 1);
+							$('#capture').css("border-radius", "50%");
 						} else {
 							deepAR.takeScreenshot();
 							$("body").fadeOut(100).fadeIn(100).fadeOut(100).fadeIn(100);
@@ -376,9 +419,6 @@
 			// 		deepAR.takeScreenshot();
 			// 	}
 			// });
-
-			// Logic for record video
-			let deeparCanvas = document.getElementById('deepar-canvas');
 
 			let videoStream = deeparCanvas.captureStream(30);
 			let mediaRecorder = new MediaRecorder(videoStream);
@@ -408,6 +448,11 @@
 			// $("#stop-video-rec").click(function() {
 			// 	mediaRecorder.stop();
 			// });
+
+			function playClapping() {
+				var audioClap = new Audio('audio/clapping.m4a');
+				audioClap.play();
+			}
 
 			function startExternalVideo() {
 				cleanupVideoObjects();
