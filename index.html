@@ -636,12 +636,14 @@
 			});
 
 			$( "#btn-share" ).click(function() {
+
 				alert(navigator.canShare);
 				if (navigator.canShare) {
 
 					const shareData = {
+						files: downloadableFile,
 						title: 'MDN',
-						files: downloadableFile
+						text: "Vacation Pictures",
 					}
 
 					// navigator.share({ title: "MDN", url: "https://www.google.com/" });
