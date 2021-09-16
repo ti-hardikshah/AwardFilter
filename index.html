@@ -538,7 +538,7 @@
 				videoObjects.videoContainer = videoContainer;
 				videoObjects.video = video;
 					
-				navigator.mediaDevices.getUserMedia({video: true}).then(function(stream) {
+				navigator.mediaDevices.getUserMedia({audio: true, video: true}).then(function(stream) {
 					try {
 						video.srcObject = stream;
 					} catch (error) {
