@@ -637,25 +637,20 @@
 
 			$( "#btn-share" ).click(function() {
 
-				alert(navigator.canShare);
-				if (navigator.canShare) {
+				alert(navigator.share);
+				if (navigator.share) {
 
 					const shareData = {
-						files: downloadableFile,
+						files: [downloadableFile],
 						title: 'MDN',
 						text: "Vacation Pictures",
 					}
 
 					// navigator.share({ title: "MDN", url: "https://www.google.com/" });
 
-					// navigator.share({
-					// 	text: 'some_text',
-					// 	files: downloadableFile,
-					// 	title: 'some_title',
-					// 	url: 'some_url'
-					// });
-
-					alert(navigator.share(shareData));
+					navigator.share(shareData)
+					.then(() => alert('Successful share'))
+					.catch((error) => alert('Error sharing', error));
 				}
 			});
 
