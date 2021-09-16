@@ -636,19 +636,28 @@
 			});
 
 			$( "#btn-share" ).click(function() {
-				alert(downloadableFile.name);
-				alert(navigator.share);
 				if (navigator.share) {
 
-					const data = {
+					const shareData = {
 						title: 'MDN',
-						text: 'Learn web development on MDN!',
 						files: downloadableFile
 					}
 
-					navigator.share({ title: "MDN", url: "https://www.google.com/" });
+					// navigator.share({ title: "MDN", url: "https://www.google.com/" });
 
-					// navigator.share(data);
+					if(navigator.canShare && navigator.canShare({ files: downloadableFile })) {
+						// navigator.share({
+						// 	text: 'some_text',
+						// 	files: downloadableFile,
+						// 	title: 'some_title',
+						// 	url: 'some_url'
+						// });
+						alert('yes');
+
+						navigator.share(shareData);
+					} else {
+						alert('no');
+					}
 
 				}
 			});
