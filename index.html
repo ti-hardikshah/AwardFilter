@@ -205,12 +205,12 @@
 	</head>
 	<body id="body" style="font-family: sans-serif;">
 
-		<canvas style="display: none;" class="deepar" id="deepar-canvas" oncontextmenu="event.preventDefault()"></canvas>
+		<canvas  class="deepar" id="deepar-canvas" oncontextmenu="event.preventDefault()"></canvas>
 		<div id="loader-wrapper">
 		<span class="loader"></span></span>
 		</div>
 
-		<div id="dim-screen" class="first-screen">
+		<div id="dim-screen" style="display: none;" class="first-screen">
 		</div>
 
 		<div class="footer first-screen" onclick="playDeepAR()">
@@ -286,105 +286,116 @@
 				}, 10000);
 			}
 
+			deepAR = DeepAR({ 
+				canvasWidth: canvasWidth, 
+				canvasHeight: canvasHeight,
+				licenseKey: 'your_license_key_goes_here',
+				canvas: deeparCanvas,
+				numberOfFaces: 1,
+				libPath: './lib',
+				segmentationInfoZip: 'segmentation.zip',
+				onInitialize: function() {
+					// start video immediately after the initalization, mirror = true
+					deepAR.startVideo(true);
+
+					// or we can setup the video element externally and call deepAR.setVideoElement (see startExternalVideo function below)
+
+					deepAR.switchEffect(0, 'slot', './effects/background_segmentation_empty', function() {
+					// effect loaded
+					});
+				}
+			});
+
+			deepAR.onCameraPermissionAsked = function() {
+				console.log('camera permission asked');
+			};
+
+			deepAR.onCameraPermissionGranted = function() {
+				console.log('camera permission granted');
+			};
+
+			deepAR.onCameraPermissionDenied = function() {
+				console.log('camera permission denied');
+			};
+
+			deepAR.onScreenshotTaken = function(photo) {
+				let aTag = document.createElement("a");
+				aTag.href = photo;
+				aTag.download = "emmy-awards-2021-screenshot.png";
+				aTag.click();
+				// myModal.style.display = "block";
+				// downloadableUrl = photo;
+				// urltoFile(photo, "emmy-awards-2021-screenshot.png", "image/png").then(file => {
+				// 	downloadableFile = file;
+				// });
+			};
+
+			deepAR.onImageVisibilityChanged = function(visible) {
+				console.log('image visible', visible);
+			};
+
+			deepAR.onFaceVisibilityChanged = function(visible) {
+				console.log('face visible', visible);
+			};
+
+			deepAR.onVideoStarted = function() {
+				var loaderWrapper = document.getElementById('loader-wrapper');
+				loaderWrapper.style.display = 'none';
+			};
+
+			deepAR.onFaceTracked = function(faceData) {
+				// console.log(faceData);
+			};
+
+			deepAR.downloadFaceTrackingModel('lib/models-68-extreme.bin');
+
+			// Store video objects for cleanup
+			var videoObjects = {};
+
 			function playDeepAR() {
 
-				deepAR = DeepAR({ 
-					canvasWidth: canvasWidth, 
-					canvasHeight: canvasHeight,
-					licenseKey: 'your_license_key_goes_here',
-					canvas: deeparCanvas,
-					numberOfFaces: 1,
-					libPath: './lib',
-					segmentationInfoZip: 'segmentation.zip',
-					onInitialize: function() {
-						// start video immediately after the initalization, mirror = true
-						deepAR.startVideo(true);
+				let count = 3;
 
-						// or we can setup the video element externally and call deepAR.setVideoElement (see startExternalVideo function below)
+				$("#start-btn").css({
+					'font-size': 'xx-large',
+					'font-weight': 'bolder'
+				});
+				$("#start-btn").text(count);
+
+				countable = setInterval(function (){
+
+					count -= 1;
+
+					if (count > 0) {
+
+						$("#start-btn").text(count);
+
+					} else if (count <= 0) {
+
+						clearInterval(countable);
+
+						$(".first-screen").hide();
+
+						// $("#loader-wrapper").show();
+						$("#deepar-canvas").show();
+						$(".cr-screen").show();
 
 						deepAR.switchEffect(0, 'slot', './effects/background_segmentation', function() {
 						// effect loaded
 						});
-					}
-				});
 
-				deepAR.onCameraPermissionAsked = function() {
-					console.log('camera permission asked');
-				};
-
-				deepAR.onCameraPermissionGranted = function() {
-					console.log('camera permission granted');
-
-					let count = 3;
-
-					$("#start-btn").css({
-						'font-size': 'xx-large',
-						'font-weight': 'bolder'
-					});
-					$("#start-btn").text(count);
-
-					countable = setInterval(function (){
-
-						count -= 1;
-
-						if (count > 0) {
-
-							$("#start-btn").text(count);
-
-						} else if (count <= 0) {
-
-							clearInterval(countable);
-
-							$(".first-screen").hide();
-
-							// $("#loader-wrapper").show();
-							$("#deepar-canvas").show();
-							$(".cr-screen").show();
-
+						setTimeout(function(){
 							playClapping();
+						}, 1000);
 
-						}
 
-					}, 1000);
-				};
+					}
 
-				deepAR.onCameraPermissionDenied = function() {
-					console.log('camera permission denied');
-				};
-
-				deepAR.onScreenshotTaken = function(photo) {
-					myModal.style.display = "block";
-					downloadableUrl = photo;
-					urltoFile(photo, "emmy-awards-2021-screenshot.png", "image/png").then(file => {
-						downloadableFile = file;
-					});
-				};
-
-				deepAR.onImageVisibilityChanged = function(visible) {
-					console.log('image visible', visible);
-				};
-
-				deepAR.onFaceVisibilityChanged = function(visible) {
-					console.log('face visible', visible);
-				};
-
-				deepAR.onVideoStarted = function() {
-					var loaderWrapper = document.getElementById('loader-wrapper');
-					loaderWrapper.style.display = 'none';
-				};
-
-				deepAR.onFaceTracked = function(faceData) {
-					console.log(faceData);
-				};
-
-				deepAR.downloadFaceTrackingModel('lib/models-68-extreme.bin');
-
-				// Store video objects for cleanup
-				var videoObjects = {};
-
-				
+				}, 1000);
 
 			}
+
+
 
 			// Click event for screenshot
 			// $("#capture").click(function() {
@@ -489,11 +500,16 @@
 				chunks = [];
 				var videoURL = URL.createObjectURL(blob);
 
-				myModal.style.display = "block";
-				downloadableUrl = videoURL;
-				urltoFile(videoURL, "emmy-awards-2021-screenshot.mp4", "video/mp4").then(file => {
-					downloadableFile = file;
-				});
+				let avTag = document.createElement("a");
+				avTag.href = videoURL;
+				avTag.download = "emmy-awards-2021-screenshot.mp4";
+				avTag.click();
+
+				// myModal.style.display = "block";
+				// downloadableUrl = videoURL;
+				// urltoFile(videoURL, "emmy-awards-2021-screenshot.mp4", "video/mp4").then(file => {
+				// 	downloadableFile = file;
+				// });
 			};
 
 			mediaRecorder.ondataavailable = function(e) {
