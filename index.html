@@ -351,8 +351,9 @@
 
 			deepAR.onScreenshotTaken = function(photo) {
 				myModal.style.display = "block";
-				downloadableFile = urltoFile(photo, "emmy-awards-2021-screenshot.png", "image/png");
-				console.log(downloadableFile);
+				urltoFile(photo, "emmy-awards-2021-screenshot.png", "image/png").then(file => {
+					downloadableFile = file;
+				});
 				// let aTag = document.createElement("a");
 				// aTag.href = photo;
 				// aTag.download = "";
@@ -624,7 +625,7 @@
 			// }
 
 		function urltoFile(url, filename, mimeType){
-			return (fetch(url)
+			return Promise.resolve(fetch(url)
 				.then(function(res){return res.arrayBuffer();})
 				.then(function(buf){return new File([buf], filename, {type:mimeType});})
 			);
@@ -635,6 +636,8 @@
 			});
 
 			$( "#btn-share" ).click(function() {
+				alert(downloadableFile.name);
+				alert(navigator.share);
 				if (navigator.share) {
 
 					const shareData = {
