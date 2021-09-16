@@ -16,7 +16,9 @@
 var x = document.getElementById("myAudio");
 
 function playAudio() { 
-  x.play(); 
+  setTimeout(function(){
+   x.play();
+  }, 3000);
 }
 function pauseAudio() { 
   x.pause(); 
