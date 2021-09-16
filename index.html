@@ -182,6 +182,7 @@
 			  padding: 20px;
 			  border: 1px solid #888;
 			  width: 80%;
+			  border-radius: 25px;
 			}
 
 			/* The Close Button */
@@ -202,7 +203,7 @@
 		<!-- <link rel="stylesheet" type="text/css" href="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.css"/> -->
 
 	</head>
-	<body id="body">
+	<body id="body" style="font-family: sans-serif;">
 
 		<canvas style="display: none;" class="deepar" id="deepar-canvas" oncontextmenu="event.preventDefault()"></canvas>
 		<div id="loader-wrapper">
@@ -213,7 +214,7 @@
 		</div>
 
 		<div class="footer first-screen" onclick="playDeepAR()">
-			<button id="start-btn" class="btn-capture" style="font-family: sans-serif;">Start</button>
+			<button id="start-btn" class="btn-capture" style="font-family: sans-serif; ">Start</button>
 		</div>
 
 		<div class="cr-screen" style="display: none;font-family: sans-serif;">
@@ -239,18 +240,22 @@
 			<!-- Modal content -->
 			<div class="modal-content">
 				<span class="close">&times;</span>
-				<button id="btn-download">Download</button>
-				<button id="btn-share">Share</button>
+				<div style="margin-top: 20px;text-align: center;">
+					<img src="images/second.png" style="max-height: 150px; width: auto;" />
+					<h3 style="margin-bottom: 40px;">Do you want to share this with your friends?</h3>
+					<img id="btn-download" style="max-height: 40px; width: auto; margin-right: 60px;" src="images/download.png"/>
+					<img id="btn-share" style="max-height: 40px; width: auto;" src="images/share.png"/>
+				</div>
 			</div>
 
 		</div>
-
 
 		<script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 		<script type="text/javascript" src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 		<!-- <script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script> -->
 		<script type="text/javascript" src="lib/deepar.js"></script>
 		<!-- <script src="https://cdn.jsdelivr.net/npm/html2canvas@1.0.0-rc.5/dist/html2canvas.min.js"></script> -->
+
 		<script type="text/javascript">
 
 			var canvasHeight = window.innerHeight;
@@ -261,7 +266,7 @@
 				canvasWidth = Math.floor(window.innerHeight*0.66);
 			}
 
-			let deepAR, downloadableFile;
+			let deepAR, downloadableFile, downloadableUrl;
 
 			// Logic for record video
 			let deeparCanvas = document.getElementById('deepar-canvas');
@@ -283,104 +288,103 @@
 
 			function playDeepAR() {
 
-				let count = 3;
+				deepAR = DeepAR({ 
+					canvasWidth: canvasWidth, 
+					canvasHeight: canvasHeight,
+					licenseKey: 'your_license_key_goes_here',
+					canvas: deeparCanvas,
+					numberOfFaces: 1,
+					libPath: './lib',
+					segmentationInfoZip: 'segmentation.zip',
+					onInitialize: function() {
+						// start video immediately after the initalization, mirror = true
+						deepAR.startVideo(true);
 
-				$("#start-btn").css({
-					'font-size': 'xx-large',
-					'font-weight': 'bolder'
-				});
-				$("#start-btn").text(count);
+						// or we can setup the video element externally and call deepAR.setVideoElement (see startExternalVideo function below)
 
-				countable = setInterval(function (){
-
-					count -= 1;
-
-					if (count > 0) {
-
-						$("#start-btn").text(count);
-
-					} else if (count <= 0) {
-
-						clearInterval(countable);
-
-						$(".first-screen").hide();
-
-						// $("#loader-wrapper").show();
-						$("#deepar-canvas").show();
-						$(".cr-screen").show();
-
-						playClapping();
-
+						deepAR.switchEffect(0, 'slot', './effects/background_segmentation', function() {
+						// effect loaded
+						});
 					}
+				});
 
-				}, 1000);
+				deepAR.onCameraPermissionAsked = function() {
+					console.log('camera permission asked');
+				};
+
+				deepAR.onCameraPermissionGranted = function() {
+					console.log('camera permission granted');
+
+					let count = 3;
+
+					$("#start-btn").css({
+						'font-size': 'xx-large',
+						'font-weight': 'bolder'
+					});
+					$("#start-btn").text(count);
+
+					countable = setInterval(function (){
+
+						count -= 1;
+
+						if (count > 0) {
+
+							$("#start-btn").text(count);
+
+						} else if (count <= 0) {
+
+							clearInterval(countable);
+
+							$(".first-screen").hide();
+
+							// $("#loader-wrapper").show();
+							$("#deepar-canvas").show();
+							$(".cr-screen").show();
+
+							playClapping();
+
+						}
+
+					}, 1000);
+				};
+
+				deepAR.onCameraPermissionDenied = function() {
+					console.log('camera permission denied');
+				};
+
+				deepAR.onScreenshotTaken = function(photo) {
+					myModal.style.display = "block";
+					downloadableUrl = photo;
+					urltoFile(photo, "emmy-awards-2021-screenshot.png", "image/png").then(file => {
+						downloadableFile = file;
+					});
+				};
+
+				deepAR.onImageVisibilityChanged = function(visible) {
+					console.log('image visible', visible);
+				};
+
+				deepAR.onFaceVisibilityChanged = function(visible) {
+					console.log('face visible', visible);
+				};
+
+				deepAR.onVideoStarted = function() {
+					var loaderWrapper = document.getElementById('loader-wrapper');
+					loaderWrapper.style.display = 'none';
+				};
+
+				deepAR.onFaceTracked = function(faceData) {
+					console.log(faceData);
+				};
+
+				deepAR.downloadFaceTrackingModel('lib/models-68-extreme.bin');
+
+				// Store video objects for cleanup
+				var videoObjects = {};
+
+				
 
 			}
-
-			deepAR = DeepAR({ 
-				canvasWidth: canvasWidth, 
-				canvasHeight: canvasHeight,
-				licenseKey: 'your_license_key_goes_here',
-				canvas: deeparCanvas,
-				numberOfFaces: 1,
-				libPath: './lib',
-				segmentationInfoZip: 'segmentation.zip',
-				onInitialize: function() {
-					// start video immediately after the initalization, mirror = true
-					deepAR.startVideo(true);
-
-					// or we can setup the video element externally and call deepAR.setVideoElement (see startExternalVideo function below)
-
-					deepAR.switchEffect(0, 'slot', './effects/background_segmentation', function() {
-					// effect loaded
-					});
-				}
-			});
-
-			deepAR.onCameraPermissionAsked = function() {
-				console.log('camera permission asked');
-			};
-
-			deepAR.onCameraPermissionGranted = function() {
-				console.log('camera permission granted');
-			};
-
-			deepAR.onCameraPermissionDenied = function() {
-				console.log('camera permission denied');
-			};
-
-			deepAR.onScreenshotTaken = function(photo) {
-				myModal.style.display = "block";
-				urltoFile(photo, "emmy-awards-2021-screenshot.png", "image/png").then(file => {
-					downloadableFile = file;
-				});
-				// let aTag = document.createElement("a");
-				// aTag.href = photo;
-				// aTag.download = "";
-				// aTag.click();
-			};
-
-			deepAR.onImageVisibilityChanged = function(visible) {
-				console.log('image visible', visible);
-			};
-
-			deepAR.onFaceVisibilityChanged = function(visible) {
-				console.log('face visible', visible);
-			};
-
-			deepAR.onVideoStarted = function() {
-				var loaderWrapper = document.getElementById('loader-wrapper');
-				loaderWrapper.style.display = 'none';
-			};
-
-			deepAR.onFaceTracked = function(faceData) {
-				console.log(faceData);
-			};
-
-			deepAR.downloadFaceTrackingModel('lib/models-68-extreme.bin');
-
-			// Store video objects for cleanup
-			var videoObjects = {};
 
 			// Click event for screenshot
 			// $("#capture").click(function() {
@@ -485,10 +489,11 @@
 				chunks = [];
 				var videoURL = URL.createObjectURL(blob);
 
-				let aVTag = document.createElement("a");
-				aVTag.href = videoURL;
-				aVTag.download = "";
-				aVTag.click();
+				myModal.style.display = "block";
+				downloadableUrl = videoURL;
+				urltoFile(videoURL, "emmy-awards-2021-screenshot.mp4", "video/mp4").then(file => {
+					downloadableFile = file;
+				});
 			};
 
 			mediaRecorder.ondataavailable = function(e) {
@@ -632,21 +637,20 @@
 			}
 
 			$( "#btn-download" ).click(function() {
-				alert( "Handler for .click() called." );
+				let aTag = document.createElement("a");
+				aTag.href = downloadableUrl;
+				aTag.download = "";
+				aTag.click();
+				myModal.style.display = "none";
 			});
 
 			$( "#btn-share" ).click(function() {
 
-				alert(navigator.share);
 				if (navigator.share) {
-
 					const shareData = {
 						files: [downloadableFile],
-						title: 'MDN',
-						text: "Vacation Pictures",
+						title: downloadableFile.name,
 					}
-
-					// navigator.share({ title: "MDN", url: "https://www.google.com/" });
 
 					navigator.share(shareData)
 					.then(() => alert('Successful share'))
