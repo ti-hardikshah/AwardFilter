@@ -624,19 +624,20 @@
 			//   }
 			// }
 
-		function urltoFile(url, filename, mimeType){
-			return Promise.resolve(fetch(url)
-				.then(function(res){return res.arrayBuffer();})
-				.then(function(buf){return new File([buf], filename, {type:mimeType});})
-			);
-		}
+			function urltoFile(url, filename, mimeType){
+				return Promise.resolve(fetch(url)
+					.then(function(res){return res.arrayBuffer();})
+					.then(function(buf){return new File([buf], filename, {type:mimeType});})
+				);
+			}
 
 			$( "#btn-download" ).click(function() {
-			  alert( "Handler for .click() called." );
+				alert( "Handler for .click() called." );
 			});
 
 			$( "#btn-share" ).click(function() {
-				if (navigator.share) {
+				alert(navigator.canShare);
+				if (navigator.canShare) {
 
 					const shareData = {
 						title: 'MDN',
@@ -645,20 +646,14 @@
 
 					// navigator.share({ title: "MDN", url: "https://www.google.com/" });
 
-					if(navigator.canShare && navigator.canShare({ files: downloadableFile })) {
-						// navigator.share({
-						// 	text: 'some_text',
-						// 	files: downloadableFile,
-						// 	title: 'some_title',
-						// 	url: 'some_url'
-						// });
-						alert('yes');
+					// navigator.share({
+					// 	text: 'some_text',
+					// 	files: downloadableFile,
+					// 	title: 'some_title',
+					// 	url: 'some_url'
+					// });
 
-						navigator.share(shareData);
-					} else {
-						alert('no');
-					}
-
+					navigator.share(shareData);
 				}
 			});
 
