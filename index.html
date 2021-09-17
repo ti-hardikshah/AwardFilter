@@ -308,6 +308,8 @@
 					// start video immediately after the initalization, mirror = true
 					deepAR.startVideo(true);
 
+					// startExternalVideo();
+
 					// or we can setup the video element externally and call deepAR.setVideoElement (see startExternalVideo function below)
 
 					deepAR.switchEffect(0, 'slot', './effects/background_segmentation_empty', function() {
@@ -395,14 +397,17 @@
 						$(".first-screen").hide();
 
 						// $("#loader-wrapper").show();
-						$("#deepar-canvas").show();
-						$(".cr-screen").show();
+						// $("#deepar-canvas").show();
+						// $(".cr-screen").show();
 
 						deepAR.switchEffect(0, 'slot', './effects/background_segmentation', function() {
 						// effect loaded
 						});
 
 						audioClapEle.play();
+
+						audioFirstEle.play();
+						audioFirstEle.pause();
 
 						setTimeout(function() {
 
@@ -555,7 +560,7 @@
 				cleanupVideoObjects();
 				// create video element
 				var video = document.createElement('video');
-				video.muted = true;
+				video.muted = false;
 				video.loop = true;
 				video.controls = true;
 				video.setAttribute('playsinline', 'playsinline');
@@ -577,6 +582,7 @@
 				videoObjects.video = video;
 					
 				navigator.mediaDevices.getUserMedia({audio: true, video: true}).then(function(stream) {
+					// console.log(stream)
 					try {
 						video.srcObject = stream;
 					} catch (error) {
