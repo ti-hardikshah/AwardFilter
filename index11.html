@@ -35,6 +35,10 @@
 	    });
 
 	    setTimeout(function () {
+	    	downloadLink.href = URL.createObjectURL(new Blob(recordedChunks));
+	    	downloadLink.download = 'acetest.webm';
+	    	downloadLink.click();
+	    	alert(1);
 	    	mediaRecorder.stop();
 	    }, 10000);
 
