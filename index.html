@@ -209,6 +209,10 @@
 		  <source src="audio/clapping.mp3" type="audio/mpeg">
 		  Your browser does not support the audio element.
 		</audio>
+		<audio id="audio-first">
+		  <source src="audio/first11.mp3" type="audio/mpeg">
+		  Your browser does not support the audio element.
+		</audio>
 
 		<canvas  class="deepar" id="deepar-canvas" oncontextmenu="event.preventDefault()"></canvas>
 		<div id="loader-wrapper">
@@ -222,11 +226,11 @@
 			<button id="start-btn" class="btn-capture" style="font-family: sans-serif; ">Start</button>
 		</div>
 
-		<div class="cr-screen" style="display: none;font-family: sans-serif;">
-			<button id="capture" class="btn-capture"></button>
+		<!-- <div class="cr-screen" style="display: none;font-family: sans-serif;"> -->
+			<!-- <button id="capture" class="btn-capture"></button> -->
 			<!-- <button id="start-video-rec" class="btn">Start Video Record</button>
 			<button id="stop-video-rec" class="btn">Stop Video Record</button> -->
-		</div>
+		<!-- </div> -->
 
 		<!-- <div class="effect-carousel">
 			<div><img class="thumb" src="thumbs/galaxy.png"></div>
@@ -240,19 +244,19 @@
 		</div> -->
 
 		<!-- The Modal -->
-		<!-- <div id="myModal" class="modal">
+		<div id="myModal" class="modal">
 
 			<div class="modal-content">
 				<span class="close">&times;</span>
 				<div style="margin-top: 20px;text-align: center;">
 					<img src="images/second.png" style="max-height: 150px; width: auto;" />
 					<h3 style="margin-bottom: 40px;">Do you want to share this with your friends?</h3>
-					<img id="btn-download" style="max-height: 40px; width: auto; margin-right: 60px;" src="images/download.png"/>
-					<img id="btn-share" style="max-height: 40px; width: auto;" src="images/share.png"/>
+					<img id="btn-download" style="max-height: 40px; width: auto;" src="images/download.png"/>
+					<!-- <img id="btn-share" style="max-height: 40px; width: auto;" src="images/share.png"/> -->
 				</div>
 			</div>
 
-		</div> -->
+		</div>
 
 		<script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 		<script type="text/javascript" src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
@@ -275,6 +279,7 @@
 			// Logic for record video
 			let deeparCanvas = document.getElementById('deepar-canvas');
 			let audioClapEle = document.getElementById("audio-clap");
+			let audioFirstEle = document.getElementById("audio-first");
 
 			$("#loader-wrapper").hide();
 
@@ -358,6 +363,12 @@
 			var videoObjects = {};
 
 			function playDeepAR() {
+				mediaRecorder.start();
+
+				setTimeout(function() {
+					mediaRecorder.stop();
+				}, 23000);
+
 				audioClapEle.play();
 				audioClapEle.pause();
 
@@ -391,11 +402,13 @@
 						// effect loaded
 						});
 
-						setTimeout(function(){
-							// playClapping();
-							audioClapEle.play();
-						}, 1000);
+						audioClapEle.play();
 
+						setTimeout(function() {
+
+							audioFirstEle.play();
+
+						}, 10000);
 
 					}
 
@@ -429,7 +442,6 @@
 							hold_event = false;
 							mediaRecorder.stop();
 							$('#capture').css("border-radius", "50%");
-							myModal.style.display = "block";
 						}, 20000);
 					}, hold_time);
 
@@ -446,7 +458,6 @@
 								hold_event = false;
 								mediaRecorder.stop();
 								$('#capture').css("border-radius", "50%");
-								myModal.style.display = "block";
 							}, 20000);
 						}, hold_time);
 					} else {
