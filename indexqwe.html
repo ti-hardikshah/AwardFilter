@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="utf-8">
+	<title></title>
+</head>
+<body>
+
+	<video autoplay="true" id="videoElement">
+
+	</video>
+
+	<script type="text/javascript">
+		var video = document.querySelector("#videoElement");
+
+		if (navigator.mediaDevices.getUserMedia) {
+		  navigator.mediaDevices.getUserMedia({ audio: true, video: true })
+		    .then(function (stream) {
+		    	stream;
+		      video.srcObject = stream;
+		    })
+		    .catch(function (err0r) {
+		      console.log("Something went wrong!");
+		    });
+		}
+	</script>
+
+</body>
+</html>
