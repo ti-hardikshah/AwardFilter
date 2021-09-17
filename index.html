@@ -274,6 +274,7 @@
 
 			// Logic for record video
 			let deeparCanvas = document.getElementById('deepar-canvas');
+			let audioClapEle = document.getElementById("audio-clap");
 
 			$("#loader-wrapper").hide();
 
@@ -357,6 +358,8 @@
 			var videoObjects = {};
 
 			function playDeepAR() {
+				audioClapEle.play();
+				audioClapEle.pause();
 
 				let count = 3;
 
@@ -390,7 +393,7 @@
 
 						setTimeout(function(){
 							// playClapping();
-							document.getElementById("audio-clap").play();
+							audioClapEle.play();
 						}, 1000);
 
 
