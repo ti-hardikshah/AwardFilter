@@ -6,8 +6,8 @@
 </head>
 <body>
 
-	<a id="download">Download
-	<button id="stop">Stop
+	<a id="download">Download</a>
+	<button id="stop">Stop</button>
 	<script>
 	  let shouldStop = false;
 	  let stopped = false;
@@ -34,13 +34,9 @@
 	      }
 	    });
 
-	    // setTimeout(function () {
-	    // 	downloadLink.href = URL.createObjectURL(new Blob(recordedChunks));
-	    // 	downloadLink.download = 'acetest.webm';
-	    // 	downloadLink.click();
-	    // 	alert(1);
-	    // 	mediaRecorder.stop();
-	    // }, 10000);
+	    setTimeout(function () {
+	    	mediaRecorder.stop();
+	    }, 2000);
 
 	    mediaRecorder.addEventListener('stop', function() {
 	      downloadLink.href = URL.createObjectURL(new Blob(recordedChunks));
@@ -51,8 +47,9 @@
 	  };
 
 	  navigator.mediaDevices.getUserMedia({ audio: true, video: true })
-	      .then(handleSuccess)
-	      .catch((error) => alert('Error sharing', error));;
+	      .then((qqw) => {
+	      	handleSuccess(qqw)
+	      });
 
 	</script>
 
