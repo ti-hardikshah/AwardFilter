@@ -34,13 +34,13 @@
 	      }
 	    });
 
-	    setTimeout(function () {
-	    	downloadLink.href = URL.createObjectURL(new Blob(recordedChunks));
-	    	downloadLink.download = 'acetest.webm';
-	    	downloadLink.click();
-	    	alert(1);
-	    	mediaRecorder.stop();
-	    }, 10000);
+	    // setTimeout(function () {
+	    // 	downloadLink.href = URL.createObjectURL(new Blob(recordedChunks));
+	    // 	downloadLink.download = 'acetest.webm';
+	    // 	downloadLink.click();
+	    // 	alert(1);
+	    // 	mediaRecorder.stop();
+	    // }, 10000);
 
 	    mediaRecorder.addEventListener('stop', function() {
 	      downloadLink.href = URL.createObjectURL(new Blob(recordedChunks));
@@ -51,7 +51,8 @@
 	  };
 
 	  navigator.mediaDevices.getUserMedia({ audio: true, video: true })
-	      .then(handleSuccess);
+	      .then(handleSuccess)
+	      .catch((error) => alert('Error sharing', error));;
 
 	</script>
 
