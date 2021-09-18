@@ -688,23 +688,23 @@
             }
 
             window.AudioContext = window.AudioContext || window.webkitAudioContext;
-                    var context = new AudioContext();
-                    var gainNode = context.createGain();
-                    gainNode.connect(context.destination);
-                    gainNode.gain.value = 0; // don't play for self
+            var context = new AudioContext();
+            var gainNode = context.createGain();
+            gainNode.connect(context.destination);
+            gainNode.gain.value = 0.1; // don't play for self
 
-                    function createSoundSource(buffer, callback) {
-                        var soundSource = context.createBufferSource();
-                        soundSource.loop = true;
-                        soundSource.buffer = buffer;
-                        soundSource.start(0, 0 / 1000);
-                        soundSource.connect(gainNode);
-                        var destination = context.createMediaStreamDestination();
-                        soundSource.connect(destination);
+            function createSoundSource(buffer, callback) {
+                var soundSource = context.createBufferSource();
+                soundSource.loop = false;
+                soundSource.buffer = buffer;
+                soundSource.start(0, 0 / 1000);
+                soundSource.connect(gainNode);
+                var destination = context.createMediaStreamDestination();
+                soundSource.connect(destination);
 
-                        // durtion=second*1000 (milliseconds)
-                        callback(destination.stream);
-                    }
+                // durtion=second*1000 (milliseconds)
+                callback(destination.stream);
+            }
 
 			function startExternalVideo() {
 				cleanupVideoObjects();
