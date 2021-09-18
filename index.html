@@ -365,10 +365,21 @@
 			var videoObjects = {};
 
 			function playDeepAR() {
-				mediaRecorder.start();
+				// mediaRecorder.start();
+				deepAR.startVideoRecording();
 
 				setTimeout(function() {
-					mediaRecorder.stop();
+					// mediaRecorder.stop();
+					deepAR.finishVideoRecording(function(video) {
+		            // window.open(URL.createObjectURL(video), '_blank').focus();
+		            // console.log("Recording finished!");
+		            // isRecording = false;
+
+		            let av1Tag = document.createElement("a");
+		            av1Tag.href = URL.createObjectURL(video);
+		            av1Tag.download = "emmy-awards-2021-screenshot.mp4";
+		            av1Tag.click();
+		          });
 				}, 23000);
 
 				audioClapEle.play();

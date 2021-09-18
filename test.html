@@ -513,6 +513,7 @@
 
 			function handelsuccess(stremtest) {
 				let videoStream = deeparCanvas.captureStream(30);
+				console.log(videoStream, stremtest);
 				let mediaRecorder = new MediaRecorder(stremtest);
 
 				mediaRecorder.start();

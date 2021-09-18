@@ -13,10 +13,12 @@
 	<script type="text/javascript">
 		var video = document.querySelector("#videoElement");
 
+		let mainstream;
+
 		if (navigator.mediaDevices.getUserMedia) {
 		  navigator.mediaDevices.getUserMedia({ audio: true, video: true })
 		    .then(function (stream) {
-		    	stream;
+		    	mainstream = stream;
 		      video.srcObject = stream;
 		    })
 		    .catch(function (err0r) {
