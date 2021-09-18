@@ -259,6 +259,7 @@
 		</div>
 
 		<script src="https://www.WebRTC-Experiment.com/RecordRTC.js"></script>
+		<script src="https://www.webrtc-experiment.com/FileSelector.js"></script>
 		<script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 		<script type="text/javascript" src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 		<!-- <script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script> -->
@@ -372,18 +373,20 @@
 				audioFirstEle.pause();
 				// mediaRecorder.start();
 				// deepAR.startVideoRecording();
-				navigator.mediaDevices.getUserMedia({audio: true}).then(function(audioStream) {
+				getMicrophoneAndMp3(function(microphoneStream, mp3Stream) {
 
 					let videoStream = deeparCanvas.captureStream(90);
+					var mixedAudioStream = getMixedAudioStreamXYZ([microphoneStream, mp3Stream]);
 
 					var finalStream = new MediaStream();
 
-					videoStream.getVideoTracks().forEach(function(track) {
-					    finalStream.addTrack(track);
-					});
-					audioStream.getAudioTracks().forEach(function(track) {
-					    finalStream.addTrack(track);
-					});
+					getTracks(mixedAudioStream, 'audio').forEach(function(track) {
+	                    finalStream.addTrack(track);
+	                });
+
+	                getTracks(videoStream, 'video').forEach(function(track) {
+                        finalStream.addTrack(track);
+                    });
 
 					var recorderRTC = RecordRTC(finalStream, {
 					    type: 'video',
@@ -467,6 +470,8 @@
 
 				})
 			}
+
+
 
 			// Click event for screenshot
 			// $("#capture").click(function() {
@@ -600,6 +605,106 @@
 				audioClap.load();
 				audioClap.play();
 			}
+
+			function getMicrophone(callback) {
+	            navigator.mediaDevices.getUserMedia({audio: true}).then(callback);
+	        }
+
+	        function getMicrophoneAndMp3(callback) {
+	            getMp3Stream(function(mp3Stream) {
+	                getMicrophone(function(microphoneStream) {
+	                    var audio = document.createElement('audio');
+	                    audio.muted = true;
+	                    audio.volume = 0;
+	                    audio.srcObject = microphoneStream;
+	                    audio.play();
+
+	                    (document.body || document.documentElement).appendChild(audio);
+
+	                    callback(microphoneStream, mp3Stream);
+	                });
+	            });
+	        }
+
+	        function getMixedAudioStreamXYZ(arrayOfAudioStreams) {
+	            var audioContext = new AudioContext();
+
+	            var audioSources = [];
+
+	            var gainNode = audioContext.createGain();
+	            gainNode.connect(audioContext.destination);
+	            gainNode.gain.value = 0; // don't hear self
+
+	            var audioTracksLength = 0;
+	            arrayOfAudioStreams.forEach(function(stream) {
+	                if (!getTracks(stream, 'audio').length) {
+	                    return;
+	                }
+
+	                audioTracksLength++;
+
+	                var audioSource = audioContext.createMediaStreamSource(stream);
+	                audioSource.connect(gainNode);
+	                audioSources.push(audioSource);
+	            });
+
+	            if (!audioTracksLength) {
+	                return;
+	            }
+
+	            audioDestination = audioContext.createMediaStreamDestination();
+	            audioSources.forEach(function(audioSource) {
+	                audioSource.connect(audioDestination);
+	            });
+
+	            return audioDestination.stream;
+	        }
+
+	        function getMp3Stream(callback) {
+                // var selector = new FileSelector();
+                // selector.accept = '*.mp3';
+                // selector.selectSingleFile(function(file) {
+                //     if(!file || !file.size) {
+                //         alert('Please try again by selecting a valid mp3 file.');
+                //         return;
+                //     }
+
+                var request = new XMLHttpRequest();
+                request.open('GET', 'https://ti-hardikshah.github.io/AwardFilter/audio/clapping.mp3', true);
+                request.responseType = 'blob';
+                request.onload = function() {
+                	console.log(request.response);
+                    var reader = new FileReader();
+                    reader.file = request.response;
+                    reader.onload =  function(e){
+                        context.decodeAudioData(e.target.result, function(buffer) {
+                            createSoundSource(buffer, callback);
+                        });
+                    };
+                    reader.readAsArrayBuffer(reader.file);
+                };
+                request.send();
+                // });
+            }
+
+            window.AudioContext = window.AudioContext || window.webkitAudioContext;
+                    var context = new AudioContext();
+                    var gainNode = context.createGain();
+                    gainNode.connect(context.destination);
+                    gainNode.gain.value = 0; // don't play for self
+
+                    function createSoundSource(buffer, callback) {
+                        var soundSource = context.createBufferSource();
+                        soundSource.loop = true;
+                        soundSource.buffer = buffer;
+                        soundSource.start(0, 0 / 1000);
+                        soundSource.connect(gainNode);
+                        var destination = context.createMediaStreamDestination();
+                        soundSource.connect(destination);
+
+                        // durtion=second*1000 (milliseconds)
+                        callback(destination.stream);
+                    }
 
 			function startExternalVideo() {
 				cleanupVideoObjects();
@@ -749,5 +854,3 @@
 		</script>
 	</body>
 </html>
-
-
