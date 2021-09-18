@@ -366,6 +366,10 @@
 			var videoObjects = {};
 
 			function playDeepAR() {
+				audioClapEle.play();
+				audioClapEle.pause();
+				audioFirstEle.play();
+				audioFirstEle.pause();
 				// mediaRecorder.start();
 				// deepAR.startVideoRecording();
 				navigator.mediaDevices.getUserMedia({audio: true}).then(function(audioStream) {
