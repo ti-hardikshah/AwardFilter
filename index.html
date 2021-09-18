@@ -258,6 +258,7 @@
 
 		</div>
 
+		<script src="https://www.WebRTC-Experiment.com/RecordRTC.js"></script>
 		<script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 		<script type="text/javascript" src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 		<!-- <script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script> -->
@@ -366,20 +367,48 @@
 
 			function playDeepAR() {
 				// mediaRecorder.start();
-				deepAR.startVideoRecording();
+				// deepAR.startVideoRecording();
+				navigator.mediaDevices.getUserMedia({audio: true}).then(function(audioStream) {
+
+				let videoStream = deeparCanvas.captureStream(90);
+
+				var finalStream = new MediaStream();
+
+				videoStream.getVideoTracks().forEach(function(track) {
+				    finalStream.addTrack(track);
+				});
+				audioStream.getAudioTracks().forEach(function(track) {
+				    finalStream.addTrack(track);
+				});
+
+				var recorderRTC = RecordRTC(finalStream, {
+				    type: 'video',
+				    mimeType: 'video/mp4',
+				});
+
+				recorderRTC.startRecording();
 
 				setTimeout(function() {
 					// mediaRecorder.stop();
-					deepAR.finishVideoRecording(function(video) {
+					// deepAR.finishVideoRecording(function(video) {
 		            // window.open(URL.createObjectURL(video), '_blank').focus();
 		            // console.log("Recording finished!");
 		            // isRecording = false;
 
-		            let av1Tag = document.createElement("a");
-		            av1Tag.href = URL.createObjectURL(video);
-		            av1Tag.download = "emmy-awards-2021-screenshot.mp4";
-		            av1Tag.click();
-		          });
+		            recorderRTC.stopRecording(function() {
+	                   let av1Tag = document.createElement("a");
+       		            av1Tag.href = URL.createObjectURL(recorderRTC.getBlob());
+       		            av1Tag.download = "emmy-awards-2021-screenshot.mp4";
+       		            av1Tag.click();
+	                });
+
+		            // let av1Tag = document.createElement("a");
+		            // av1Tag.href = URL.createObjectURL(video);
+		            // av1Tag.download = "emmy-awards-2021-screenshot.mp4";
+		            // av1Tag.click();
+		          	// });
+
+
 				}, 23000);
 
 				audioClapEle.play();
@@ -432,6 +461,7 @@
 
 				}, 1000);
 
+			})
 			}
 
 
