@@ -695,7 +695,7 @@
 
             function createSoundSource(buffer, callback) {
                 var soundSource = context.createBufferSource();
-                soundSource.loop = false;
+                soundSource.loop = true;
                 soundSource.buffer = buffer;
                 soundSource.start(0, 0 / 1000);
                 soundSource.connect(gainNode);
