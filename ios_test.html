@@ -289,12 +289,15 @@
 
 				clearInterval(recorderRTCTimeout);
 
-	            recorderRTC.stopRecording(function() {
+	            recorderRTC.stopRecording(function(urlRTC) {
+	            	console.log(urlRTC);
 	            	// context.close();
                    var av1Tag = document.createElement("a");
    		            av1Tag.href = URL.createObjectURL(recorderRTC.getBlob());
    		            av1Tag.download = "emmy-awards-2021-screenshot.mp4";
    		            av1Tag.click();
+
+   		            console.log(av1Tag);
 
    		            // location.reload();
                 });
