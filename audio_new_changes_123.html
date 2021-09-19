@@ -259,8 +259,7 @@
 
 		</div>
 
-		<script src="https://www.WebRTC-Experiment.com/RecordRTC.js"></script>
-		<script src="https://www.webrtc-experiment.com/FileSelector.js"></script>
+		<script src="lib/RecordRTC.js"></script>
 		<script type="text/javascript" src="//code.jquery.com/jquery-1.11.0.min.js"></script>
 		<script type="text/javascript" src="//code.jquery.com/jquery-migrate-1.2.1.min.js"></script>
 		<!-- <script type="text/javascript" src="//cdn.jsdelivr.net/npm/slick-carousel@1.8.1/slick/slick.min.js"></script> -->
@@ -291,14 +290,9 @@
 				clearInterval(recorderRTCTimeout);
 
 	            recorderRTC.stopRecording(function() {
-
-	            	var fileRTC = new File([recorderRTC.getBlob()], 'emmy-awards-2021-screenshot.mp4', {
-	            		type: 'video/mp4'
-					});
-
 	            	// context.close();
                    var av1Tag = document.createElement("a");
-   		            av1Tag.href = URL.createObjectURL(fileRTC);
+   		            av1Tag.href = URL.createObjectURL(recorderRTC.getBlob());
    		            av1Tag.download = "emmy-awards-2021-screenshot.mp4";
    		            av1Tag.click();
 
@@ -432,15 +426,11 @@
 
 			            recorderRTC.stopRecording(function() {
 			            	clearInterval(recorderRTCTimeout);
-			                var fileRTC = new File([recorderRTC.getBlob()], 'emmy-awards-2021-screenshot.mp4', {
-		            			type: 'video/mp4'
-							});
-
-			            	// context.close();
 		                   var av1Tag = document.createElement("a");
-		   		            av1Tag.href = URL.createObjectURL(fileRTC);
-		   		            av1Tag.download = "emmy-awards-2021-screenshot.mp4";
-		   		            av1Tag.click();
+	       		            av1Tag.href = URL.createObjectURL(recorderRTC.getBlob());
+	       		            av1Tag.download = "emmy-awards-2021-screenshot.mp4";
+	       		            av1Tag.click();
+
                             $("#stop-btn").hide();
 
                             // location.reload();
