@@ -219,11 +219,12 @@
 		<span class="loader"></span></span>
 		</div>
 
-		<div id="dim-screen" style="display: none;" class="first-screen">
-		</div>
+		<!-- <div id="dim-screen" style="display: none;" class="first-screen">
+		</div> -->
 
-		<div class="footer first-screen" onclick="playDeepAR()">
-			<button id="start-btn" class="btn-capture" style="font-family: sans-serif; ">Start</button>
+		<div class="footer first-screen">
+			<button id="start-btn" class="btn-capture" style="font-family: sans-serif; " onclick="playDeepAR()">Start</button>
+			<button id="stop-btn" class="btn-capture" style="display: none; font-family: sans-serif; ">Stop</button>
 		</div>
 
 		<!-- <div class="cr-screen" style="display: none;font-family: sans-serif;"> -->
@@ -276,7 +277,7 @@
 				canvasWidth = Math.floor(window.innerHeight*0.66);
 			}
 
-			let deepAR, downloadableFile, downloadableUrl;
+			let deepAR, downloadableFile, downloadableUrl, recorderRTC, recorderRTCTimeout;
 
 			// Logic for record video
 			let deeparCanvas = document.getElementById('deepar-canvas');
@@ -284,6 +285,33 @@
 			let audioFirstEle = document.getElementById("audio-first");
 
 			$("#loader-wrapper").hide();
+
+			$("#stop-btn").click(function() {
+
+				clearInterval(recorderRTCTimeout);
+
+	            recorderRTC.stopRecording(function() {
+
+	            	var fileRTC = new File([recorderRTC.getBlob()], 'emmy-awards-2021-screenshot.mp4', {
+	            		type: 'video/mp4'
+					});
+
+	            	// context.close();
+                   var av1Tag = document.createElement("a");
+   		            av1Tag.href = URL.createObjectURL(fileRTC);
+   		            av1Tag.download = "emmy-awards-2021-screenshot.mp4";
+   		            av1Tag.click();
+
+   		            // location.reload();
+                });
+
+                $("#stop-btn").hide();
+
+	            // $("#start-btn").text("Start");
+             //    $("#start-btn").show();
+
+			});
+
 
 			function playAudio() {
 				var audio = new Audio('audio/first.mp3');
@@ -388,14 +416,14 @@
                         finalStream.addTrack(track);
                     });
 
-					var recorderRTC = RecordRTC(finalStream, {
+					recorderRTC = RecordRTC(finalStream, {
 					    type: 'video',
 					    mimeType: 'video/mp4',
 					});
 
 					recorderRTC.startRecording();
 
-					setTimeout(function() {
+					recorderRTCTimeout = setTimeout(function() {
 						// mediaRecorder.stop();
 						// deepAR.finishVideoRecording(function(video) {
 			            // window.open(URL.createObjectURL(video), '_blank').focus();
@@ -403,10 +431,22 @@
 			            // isRecording = false;
 
 			            recorderRTC.stopRecording(function() {
-		                   let av1Tag = document.createElement("a");
-	       		            av1Tag.href = URL.createObjectURL(recorderRTC.getBlob());
-	       		            av1Tag.download = "emmy-awards-2021-screenshot.mp4";
-	       		            av1Tag.click();
+			            	clearInterval(recorderRTCTimeout);
+			                var fileRTC = new File([recorderRTC.getBlob()], 'emmy-awards-2021-screenshot.mp4', {
+		            			type: 'video/mp4'
+							});
+
+			            	// context.close();
+		                   var av1Tag = document.createElement("a");
+		   		            av1Tag.href = URL.createObjectURL(fileRTC);
+		   		            av1Tag.download = "emmy-awards-2021-screenshot.mp4";
+		   		            av1Tag.click();
+                            $("#stop-btn").hide();
+
+                            // location.reload();
+
+            	            // $("#start-btn").text("Start");
+                         //    $("#start-btn").show();
 		                });
 
 			            // let av1Tag = document.createElement("a");
@@ -416,7 +456,7 @@
 			          	// });
 
 
-					}, 60000);
+					}, 43000);
 
 					audioClapEle.play();
 					audioClapEle.pause();
@@ -443,17 +483,18 @@
 
 							clearInterval(countable);
 
-							$(".first-screen").hide();
+							$("#start-btn").hide();
+							$("#stop-btn").show();
 
 							// $("#loader-wrapper").show();
 							// $("#deepar-canvas").show();
 							// $(".cr-screen").show();
 
-							deepAR.switchEffect(0, 'slot', './effects/EmmyAward_TrophyWithBackGroung', function() {
+							deepAR.switchEffect(0, 'slot', './effects/background_segmentation', function() {
 							// effect loaded
 							});
 
-							audioClapEle.play();
+							// audioClapEle.play();
 
 							audioFirstEle.play();
 							audioFirstEle.pause();
@@ -670,10 +711,9 @@
                 //     }
 
                 var request = new XMLHttpRequest();
-                request.open('GET', 'https://ti-hardikshah.github.io/AwardFilter/audio/mixed_audio.mp3', true);
+                request.open('GET', 'audio/mixed_audio.mp3', true);
                 request.responseType = 'blob';
                 request.onload = function() {
-                	console.log(request.response);
                     var reader = new FileReader();
                     reader.file = request.response;
                     reader.onload =  function(e){
@@ -694,10 +734,11 @@
             gainNode.gain.value = 0.1; // don't play for self
 
             function createSoundSource(buffer, callback) {
+
                 var soundSource = context.createBufferSource();
                 soundSource.loop = false;
                 soundSource.buffer = buffer;
-                soundSource.start(0, 0 / 1000);
+                soundSource.start(5, 0 / 1000);
                 soundSource.connect(gainNode);
                 var destination = context.createMediaStreamDestination();
                 soundSource.connect(destination);
